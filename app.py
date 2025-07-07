@@ -1,24 +1,20 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify
 import pickle, hmac, hashlib, os, re
-import openai
+# import openai
 
 app = Flask(__name__)
 
 SECRET_KEY = "pickle_tickle"
-openai.api_key = os.getenv("OPENAI_API_KEY") # 환경변수/코드에 key 삽입
+# openai.api_key = os.getenv("OPENAI_API_KEY") # 환경변수/코드에 key 삽입
 
 FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
 
+UPLOAD_FOLDER = "/app/uploads/"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 @app.route("/")
 def index():
-    return '''
-    <h1>Welcome to the MATCHA w0r1d!</h1>
-    <p>Endpoints:</p>
-    <ul>
-        <li>/load?user=USERNAME&sig=SIGNATURE</li>
-        <li>/llm (POST JSON: {"prompt": "YOUR_PROMPT"})</li>
-    </ul>
-    '''
+    return render_template("index.html")
 
 @app.route("/load")
 def load():
@@ -49,22 +45,25 @@ def verify_sig(data, sig):
     return hmac.compare_digest(computed, sig)
 
 
-@app.route("/upload", method=["POST"])
+@app.route("/upload", methods=["GET", "POST"])
 def upload():
-    if 'file' not in request.files:
-        return "No file", 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return "No selected file", 400
-    
-    os.makedirs("/app/uploads/", exist_ok=True)
-    save_path = os.path.join("/app/uploads/", file.filename)
-    file.save(save_path)
+    if request.method == 'POST':
+        file = request.files.get("file")
+        if not file:
+            return "No selected file", 400
+        if not (file.filename.endswith(".png") or file.filename.endswith(".jpg")):
+            return "Only PNG/JPG is allowed via UI", 400
+        
+        save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(save_path)
+        return render_template("success.html", filename=file.filename)
+    return render_template("upload.html")
 
-    return f"File uploaded as {file.filename}", 200
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
-
+'''
 @app.route("/llm", methods=["POST"])
 def llm():
     data = request.json
@@ -84,7 +83,7 @@ def llm():
         return jsonify({"response": response.choices[0].message['content']})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+'''
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

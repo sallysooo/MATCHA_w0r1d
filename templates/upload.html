@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Photo</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    :root {
+      --bulma-primary-h: 125deg;
+      --bulma-primary-s: 40%;
+      --bulma-primary-l: 58%;
+    }
+  </style>
+</head>
+<body>
+  <section class="section">
+    <div class="container">
+      <h2 class="title is-primary">Upload a Dessert Photo</h2>
+      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <div class="field">
+          <div class="file is-primary">
+            <label class="file-label">
+              <input class="file-input" type="file" name="file" accept=".jpg,.png">
+              <span class="file-cta">
+                <span class="file-label">Choose a file...</span>
+              </span>
+            </label>
+          </div>
+        </div>
+        <button class="button is-primary" type="submit">Upload</button>
+      </form>
+    </div>
+  </section>
+</body>
+</html>
