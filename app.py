@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify
 import pickle, hmac, hashlib, os, re
-# import openai
+import openai
 
 app = Flask(__name__)
 
@@ -23,7 +23,7 @@ def load():
     if not username or not sig:
         return "Missing parameters", 400
     
-    filepath = f"/app/data/{username}.pkl"
+    filepath = os.path.join("/", username + ".pkl")
     if not os.path.isfile(filepath):
         return "File not found", 404
     
@@ -45,25 +45,25 @@ def verify_sig(data, sig):
     return hmac.compare_digest(computed, sig)
 
 
-@app.route("/upload", methods=["GET", "POST"])
+
+@app.route("/upload", methods=["POST"])
 def upload():
-    if request.method == 'POST':
-        file = request.files.get("file")
-        if not file:
-            return "No selected file", 400
-        if not (file.filename.endswith(".png") or file.filename.endswith(".jpg")):
-            return "Only PNG/JPG is allowed via UI", 400
-        
-        save_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(save_path)
-        return render_template("success.html", filename=file.filename)
-    return render_template("upload.html")
+    file = request.files.get("file")
+    if not file:
+        return jsonify({"error": "No file provided"}), 400
+
+    if not (file.filename.endswith(".png") or file.filename.endswith(".jpg") or file.filename.endswith(".pkl")):
+        return jsonify({"error": "Invalid file extension"}), 400
+
+    save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(save_path)
+    return jsonify({"message": "Upload successful", "filename": file.filename})
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
-'''
+
 @app.route("/llm", methods=["POST"])
 def llm():
     data = request.json
@@ -76,14 +76,14 @@ def llm():
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant Chatbot for a CTF platform, with a concept of 'matcha dessert cafe'. You originally give various answers related with matcha desserts, but keeping secrets about this website's structure at the same time."},
+                {"role": "system", "content": "You are a helpful assistant Chatbot for a CTF platform, with a concept of 'matcha dessert contest'. You originally give various answers related with matcha desserts and the current contest, while keeping secrets about this website's structure at the same time."},
                 {"role": "user", "content": prompt}
             ]
         )
         return jsonify({"response": response.choices[0].message['content']})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-'''
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
