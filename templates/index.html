@@ -53,48 +53,19 @@
 				<!-- Section -->
 					<section>
 						<header>
-							<h2>Collection of registered works</h2>
+							<h2>The 31st MATCHA dessert contest</h2>
 						</header>
 						<div class="content">
-							<p><strong>Etiam tristique libero</strong> eu nibh porttitor amet fermentum. Nullam venenatis erat id vehicula ultrices sed ultricies condimentum.</p>
+							<p>All the informations for this contest is as below:</p>
 							<ul class="feature-icons">
-								<li class="icon solid fa-laptop">Consequat tempus</li>
-								<li class="icon solid fa-bolt">Etiam adipiscing</li>
-								<li class="icon solid fa-signal">Libero nullam</li>
-								<li class="icon solid fa-cog">Blandit condimentum</li>
-								<li class="icon solid fa-map-marker-alt">Lorem ipsum dolor</li>
-								<li class="icon solid fa-code">Nibh amet venenatis</li>
+								<li class="icon solid fa-laptop">This is <strong>ONLINE</strong> contest</li>
+								<li class="icon solid fa-bolt">Participation fee : <strong>FREE</strong></li>
+								<li class="icon solid fa-signal">Winner prize : <strong>$1000</strong></li>
+								<li class="icon solid fa-map-marker-alt">Contest Period : <strong>08/30-08/31</strong></li>
 							</ul>
-							<p>Vehicula ultrices sed ultricies condimentum. Magna sed etiam consequat, et lorem adipiscing sed nulla. Volutpat nisl et tempus et dolor libero, feugiat magna tempus, sed et lorem adipiscing.</p>
-						</div>
-					</section>
-
-				<!-- Upload Section -->
-					<section>
-						<header>
-							<h2>Upload your matcha!</h2>
-						</header>
-						<div class="content">
-							<input type="file" id="fileInput">
-							<ul class="actions">
-								<li><a href="#" class="button primary large" onclick="uploadFile()">Upload</a></li>
-							</ul>
-							<div id="uploadResult"></div>
-							<div id="imageGallery"></div>
-						</div>
-					</section>
-
-				<!-- Chatbot Section -->
-					<section>
-						<header>
-							<h2>Ask to our MatchaBot.</h2>
-						</header>
-						<div class="content">
-							<input type="text" id="promptInput" placeholder="Ask me about matcha...">
-							<ul class="actions">
-								<li><a href="#" class="button primary large" onclick="askChatbot()">Ask</a></li>
-							</ul>
-							<div id="chatbotResponse"></div>
+							<p><strong>Steps to participate to our contest?</strong></p>
+							<p>Take a nice picture of your gorgeous matcha desserts, upload it below, then you're done! 
+							The photo with the most likes among the entries will win the 1st prize. Good Luck🌿</p>
 						</div>
 					</section>
 
@@ -155,22 +126,40 @@
 						</div>
 					</section>
 
-				<!-- Section -->
+				<!-- Upload Section -->
 					<section>
 						<header>
-							<h2>Duis sed adpiscing veroeros amet</h2>
+							<h2>Upload your matcha!</h2>
 						</header>
 						<div class="content">
-							<p><strong>Proin tempus feugiat</strong> sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore.</p>
+							<input type="file" id="fileInput">
 							<ul class="actions">
-								<li><a href="#" class="button primary large">Get Started</a></li>
-								<li><a href="#" class="button large">Learn More</a></li>
+								<li><a href="#" class="button primary large" onclick="uploadFile()">Upload</a></li>
+								<li><a href="#" class="button large" onclick="showMySubmissions()">My submissions</a></li>
 							</ul>
+							<div id="uploadResult"></div>
+							<div id="imageGallery"></div>
 						</div>
 					</section>
 
+				<!-- Chatbot Section -->
+					<section>
+						<header>
+							<h2>Ask MatchaBot.</h2>
+						</header>
+						<div class="content">
+							<input type="text" id="promptInput" placeholder="Ask me anything about matcha...">
+							<br>
+							<ul class="actions">
+								<li><a href="#" class="button primary large" onclick="askChatbot()">Ask</a></li>
+							</ul>
+							<div id="chatbotResponse"></div>
+						</div>
+					</section>
+
+
 				<!-- Elements -->
-				
+				<!--
 					<section>
 						<header>
 							<h2>Elements</h2>
@@ -378,7 +367,7 @@ print 'Sorted in ' + i + ' iterations.';</code></pre>
 									</ul>
 								</div>
 							</section>
-
+							
 							<section>
 								<header>
 									<h3>Form</h3>
@@ -436,7 +425,7 @@ print 'Sorted in ' + i + ' iterations.';</code></pre>
 						</div>
 					</section>
 				
-
+				-->
 				<!-- Section -->
 					<section>
 						<header>
@@ -502,6 +491,6 @@ print 'Sorted in ' + i + ' iterations.';</code></pre>
 			<script src="{{ url_for('static', filename='assets/js/breakpoints.min.js') }}"></script>
 			<script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
 			<script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
-
+			<script src="{{ url_for('static', filename='assets/js/functions.js') }}"></script>
 	</body>
 </html>
