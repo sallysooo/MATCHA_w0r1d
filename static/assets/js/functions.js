@@ -1,5 +1,7 @@
 // 1. 파일 업로드
-async function uploadFile() {
+async function uploadFile(event) {
+    if(event) event.preventDefault();
+
     const input = document.getElementById("fileInput");
     const file = input.files[0];
     const resultDiv = document.getElementById("uploadResult");
@@ -13,7 +15,7 @@ async function uploadFile() {
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
 
     if (!allowedExtensions.includes(ext)) {
-        resultDiv.innerText = "❌ Invalid file type. Only .jpg, .png, .pkl are allowed.";
+        resultDiv.innerText = "❌ Invalid file type.";
         return;
     }
 
@@ -50,7 +52,9 @@ async function uploadFile() {
 }
 
 // 2. My submission button
-async function showMySubmissions() {
+async function showMySubmissions(event) {
+    if (event) event.preventDefault();
+
     const gallery = document.getElementById("imageGallery");
     gallery.innerHTML = ""; // refresh
 
@@ -74,7 +78,9 @@ async function showMySubmissions() {
 }
 
 // 3. 챗봇 프롬프트 전송
-async function askChatbot() {
+async function askChatbot(event) {
+    if (event) event.preventDefault();
+    
     const input = document.getElementById("promptInput");
     const prompt = input.value.trim();
     const responseDiv = document.getElementById("chatbotResponse");

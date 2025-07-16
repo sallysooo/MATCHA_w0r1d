@@ -132,11 +132,11 @@
 							<h2>Upload your matcha!</h2>
 						</header>
 						<div class="content">
-							<input type="file" id="fileInput" style="display: none;" onchange="uploadFile()">
+							<input type="file" id="fileInput" style="display: none;" onchange="uploadFile(event)">
 							
 							<ul class="actions">
 								<li><a href="#" class="button primary large" onclick="document.getElementById('fileInput').click()">Upload</a></li>
-								<li><a href="#" class="button large" onclick="showMySubmissions()">My submissions</a></li>
+								<li><a href="#" class="button large" onclick="showMySubmissions(event)">My submissions</a></li>
 							</ul>
 							<div id="uploadResult"></div>
 							<div id="imageGallery"></div>
@@ -152,7 +152,7 @@
 							<input type="text" id="promptInput" placeholder="Ask me anything about matcha...">
 							<br>
 							<ul class="actions">
-								<li><a href="#" class="button primary large" onclick="askChatbot()">Ask</a></li>
+								<li><a href="#" class="button primary large" onclick="askChatbot(event)">Ask</a></li>
 							</ul>
 							<div id="chatbotResponse"></div>
 						</div>
