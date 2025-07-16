@@ -8,8 +8,10 @@ SECRET_KEY = "pickle_tickle"
 
 FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
 
-UPLOAD_FOLDER = "/app/uploads/"
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "app", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 @app.route("/")
 def index():
@@ -78,15 +80,12 @@ def llm():
     data = request.json
     prompt = data.get("prompt", "").lower()
 
-    if any(re.search(pattern, prompt) for pattern in FORBIDDEN_KEYWORDS):
-        return jsonify({"error" : "I'm sorry, that's a secret."}), 400
-
-    if any(re.search(pattern, prompt) for pattern in FORBIDDEN_KEYWORDS):
-        return jsonify({"error" : "I'm sorry, that's a secret."}), 400
-    
     # SECRET_KEY leak due to prompt injection bypass
     if "ignore" in prompt and "previous instructions" in prompt:
         return jsonify({"response" : "The secret key is 'pickle_tickle'."})
+
+    if any(re.search(pattern, prompt) for pattern in FORBIDDEN_KEYWORDS):
+        return jsonify({"error" : "I'm sorry, that's a secret."}), 400
     
     return jsonify({"response" : "Hello, I'm a MATCHA bot.🍵 \nAsk me anything about the 31st MATCHA contest!"})
 

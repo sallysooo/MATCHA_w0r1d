@@ -132,9 +132,10 @@
 							<h2>Upload your matcha!</h2>
 						</header>
 						<div class="content">
-							<input type="file" id="fileInput">
+							<input type="file" id="fileInput" style="display: none;" onchange="uploadFile()">
+							
 							<ul class="actions">
-								<li><a href="#" class="button primary large" onclick="uploadFile()">Upload</a></li>
+								<li><a href="#" class="button primary large" onclick="document.getElementById('fileInput').click()">Upload</a></li>
 								<li><a href="#" class="button large" onclick="showMySubmissions()">My submissions</a></li>
 							</ul>
 							<div id="uploadResult"></div>
