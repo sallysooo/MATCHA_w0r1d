@@ -46,26 +46,53 @@ def verify_sig(data, sig):
     return hmac.compare_digest(computed, sig)
 
 
-
+# 파일 업로드 구현
 @app.route("/upload", methods=["POST"])
-def upload():
+def upload_file():
     file = request.files.get("file")
-    if not file:
-        return jsonify({"error": "No file provided"}), 400
+    sig = request.form.get("sig") # HMAC verify
+    # 근데 이게 좀 로직 개선이 필요한게, pkl 파일이 아닌 사진을 올릴때도 sig가 필요하다는 거잖아? 근데 나는 오직 pkl 파일 업로드 시에만 sig를 필요로 하는거니까 if문 같은걸로 가지치기 해야할 듯
+    
+    if not file or not sig:
+        return jsonify({"error": "No file uploaded"}), 400
 
-    if not (file.filename.endswith(".png") or file.filename.endswith(".jpg") or file.filename.endswith(".pkl")):
-        return jsonify({"error": "Invalid file extension"}), 400
+    filename = file.filename
+    ext = os.path.splitext(filename)[-1].lower()
 
+    # extension filter
+    if ext not in [".jpg", ".png", ".pkl"]:
+        return jsonify({"error" : "Invalid file type."}), 400
+    
+    # HMAC verification is possible only if the file contents are read first.
+    data = file.read()
+
+    # HMAC verification
+    if ext == ".pkl" and not verify_sig(data, sig):
+        return jsonify({"error":"Invalid signature"}), 403
+
+    # save
     save_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(save_path)
-    return jsonify({"message": "Upload successful", "filename": file.filename})
+    with open(save_path, "wb") as f:
+        f.write(data)
+
+    if ext == ".pkl":
+        try:
+            with open(save_path, "rb") as f:
+                obj = pickle.load(f)   #### RCE attack here
+            return jsonify({"message": "Upload successful", "filename": filename})
+        except Exception as e:
+            return jsonify({"error": f"Deserialization failed: {e}"}), 500
+
+    return jsonify({"message": "Upload successful", "filename": filename})
 
 
-@app.route("/uploads/<filename>")
+# 정적 파일 serving (이미지 보기용)
+@app.route("/uploads/<path:filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
+# 업로드된 파일 목록 조회
 @app.route("/uploads")
 def list_uploads():
     try:

