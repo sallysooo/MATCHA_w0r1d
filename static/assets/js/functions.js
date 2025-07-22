@@ -63,13 +63,26 @@ async function showMySubmissions(event) {
         const files = await response.json(); // ['img1.png', 'img2.jpg', ...]
 
         for (const filename of files) {
-            if (filename.endsWith(".jpg") || filename.endsWith(".png")) {
+            const ext = filename.slice(filename.lastIndexOf(".")).toLowerCase();
+
+            // show image file
+            if (ext === ".jpg" || ext === ".png") {
                 const img = document.createElement("img");
                 img.src = `/uploads/${filename}`;
                 img.alt = filename;
                 img.style.maxWidth = "300px";
                 img.style.margin = "10px";
                 gallery.appendChild(img);
+            }
+            // show text file in link
+            else if (ext === ".txt"){
+                const link = document.createElement("a");
+                link.href =  `/uploads/${filename}`;
+                link.textContent = `${filename}`;
+                link.target = "_blank";
+                link.style.display = "block";
+                link.style.margin = "5px 0";
+                gallery.appendChild(link);
             }
         }
     } catch (error) {

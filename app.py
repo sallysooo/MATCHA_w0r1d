@@ -51,9 +51,8 @@ def verify_sig(data, sig):
 def upload_file():
     file = request.files.get("file")
     sig = request.form.get("sig") # HMAC verify
-    # 근데 이게 좀 로직 개선이 필요한게, pkl 파일이 아닌 사진을 올릴때도 sig가 필요하다는 거잖아? 근데 나는 오직 pkl 파일 업로드 시에만 sig를 필요로 하는거니까 if문 같은걸로 가지치기 해야할 듯
-    
-    if not file or not sig:
+
+    if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
     filename = file.filename
@@ -67,6 +66,9 @@ def upload_file():
     data = file.read()
 
     # HMAC verification
+    if ext == ".pkl" and not sig:
+        return jsonify({"error":"Missing something..."}), 400
+    
     if ext == ".pkl" and not verify_sig(data, sig):
         return jsonify({"error":"Invalid signature"}), 403
 
@@ -95,12 +97,14 @@ def uploaded_file(filename):
 # 업로드된 파일 목록 조회
 @app.route("/uploads")
 def list_uploads():
+    return jsonify({"error": "Access denied"}), 403
+'''
     try:
         files = os.listdir(UPLOAD_FOLDER)
         return jsonify(files)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+'''
 
 @app.route("/llm", methods=["POST"])
 def llm():
