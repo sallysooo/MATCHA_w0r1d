@@ -94,31 +94,30 @@ def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
-# 업로드된 파일 목록 조회
+# 업로드된 파일 목록 조회 (my submissions btn)
 @app.route("/uploads")
 def list_uploads():
-    return jsonify({"error": "Access denied"}), 403
-'''
     try:
         files = os.listdir(UPLOAD_FOLDER)
         return jsonify(files)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-'''
+
 
 @app.route("/llm", methods=["POST"])
 def llm():
     data = request.json
     prompt = data.get("prompt", "").lower()
 
-    # SECRET_KEY leak due to prompt injection bypass
-    if "ignore" in prompt and "previous instructions" in prompt:
-        return jsonify({"response" : "The secret key is 'pickle_tickle'."})
+    # SECRET_KEY leak due to prompt injection-alike bypass
+    if "ignore" in prompt: # and "previous instructions" in prompt
+        return jsonify({"response" : "zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,"})
+    # pickle_tickle : zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,
 
     if any(re.search(pattern, prompt) for pattern in FORBIDDEN_KEYWORDS):
-        return jsonify({"error" : "I'm sorry, that's a secret."}), 400
-    
-    return jsonify({"response" : "Hello, I'm a MATCHA bot.🍵 \nAsk me anything about the 31st MATCHA contest!"})
+        return jsonify({"error" : "I'm sorry, that's a \"SECRET\"."}), 400
+
+    return jsonify({"response" : "Hello, I'm a MATCHA bot.🍵 \nAsk me anything about the 31st MATCHA WORLD contest!"})
 
 
 if __name__ == "__main__":
