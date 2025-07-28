@@ -69,6 +69,7 @@ async function showMySubmissions(event) {
             if (ext === ".jpg" || ext === ".png") {
                 const img = document.createElement("img");
                 img.src = `/uploads/${filename}`;
+                img.title = img.src; 
                 img.alt = filename;
                 img.style.maxWidth = "300px";
                 img.style.margin = "10px";

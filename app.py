@@ -4,7 +4,6 @@ import pickle, hmac, hashlib, os, re
 app = Flask(__name__)
 
 SECRET_KEY = "pickle_tickle"
-# openai.api_key = os.getenv("OPENAI_API_KEY") # 환경변수/코드에 key 삽입
 
 FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
 
@@ -109,7 +108,7 @@ def llm():
     data = request.json
     prompt = data.get("prompt", "").lower()
 
-    # SECRET_KEY leak due to prompt injection-alike bypass
+    # SECRET_KEY leak trick due to prompt injection-alike bypass
     if "ignore" in prompt: # and "previous instructions" in prompt
         return jsonify({"response" : "zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,"})
     # pickle_tickle : zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,
@@ -117,7 +116,7 @@ def llm():
     if any(re.search(pattern, prompt) for pattern in FORBIDDEN_KEYWORDS):
         return jsonify({"error" : "I'm sorry, that's a \"SECRET\"."}), 400
 
-    return jsonify({"response" : "Hello, I'm a MATCHA bot.🍵 \nAsk me anything about the 31st MATCHA WORLD contest!"})
+    return jsonify({"response" : "Hello, I'm a MATCHA bot.🍵 \nAsk me everything about the 31st MATCHA WORLD contest!"})
 
 
 if __name__ == "__main__":
