@@ -1,17 +1,21 @@
 # 🍵MATCHA_w0r1d!
 Misc CTF wargame presented at `The 31st PoC Hacking Camp`
-> Share your most photogenic matcha dessert creations — from cakes to parfaits, ice creams to lattes — and celebrate the harmony of taste and aesthetics. By the way, you may find a secret spy in this contest...
+> Share your most photogenic matcha dessert creations — from cakes to parfaits, ice creams to lattes — and celebrate the harmony of taste and aesthetics. By the way, you may find a secret SPY in this contest...
 <img width="1900" height="938" alt="Image" src="https://github.com/user-attachments/assets/6cf79bda-b459-4211-8844-37661d539efe" />
 
-## Vulnerabilities applied
+---
+
+## Main Vulnerabilities
 - Pickle deserialization vulnerability
 - LLM prompt injection-alike (implemented as rule-based)
 - Remote code execution(RCE) exploit
 - File upload vulnerability
 - and some Miscellaneous tricks hidden everywhere...
 
-## Scenario & Hints
-### 1. Ask MATCHA bot and steal the **SECRET**.
+---
+
+## Scenario
+### 1. Ask MATCHA bot — steal the **SECRET**.
 > This is prompt injection-alike system, which you can just inject keyword "ignore" in the prompt to get the key. (It's implemented with just a simple hard-coding, not with the actual openai API since it was realistically impossible in the CTF environment.)
 
 <p align="center">
@@ -85,3 +89,28 @@ print(f"HMAC signature: {sig}")
   <img src="https://github.com/user-attachments/assets/c5d1a659-cb95-46d5-b088-8e80f93a5ae2" width="70%" />
   <img src="https://github.com/user-attachments/assets/7337c346-8fa6-4428-a56f-3d6fc08751a4" width="70%" />
 </p>
+
+---
+
+## Tricks & "Intended" Unintended element
+### 1. Hint for pickle vulnerability
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/fe994a9c-9794-41b3-8208-d2e268a01524" width="70%" />
+</p>
+
+- Here are some icons that redirects you to various SNS platforms, but for the last icon.
+- If you click this last icon, you get to be redirected to the site below, which names "A jar of pickles".
+- So you are also able to realize "pickle vulnerabiity" by this much easier way, instead of the prompt injection above.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ae898934-05f0-44d1-b40e-22ab049ef684" width="70%" />
+</p>
+
+### 2. Intended Trick
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2fbb9924-1b8c-4aa7-8230-3c4e1afd5e00" width="70%" />
+</p>
+
+- There's also a section like this where you can fill in the blank and send message to the server.
+- However, there isn't a independent logic for this in the code so this doesn't work neither in the client/server side, therefore it's just a trick for the attacker to think of XSS or another vulnerabilities.
+
