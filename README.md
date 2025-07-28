@@ -1,22 +1,23 @@
 # 🍵MATCHA_w0r1d!
-Misc CTF wargame presented at `The 31st PoC Hacking Camp`
-> Share your most photogenic matcha dessert creations — from cakes to parfaits, ice creams to lattes — and celebrate the harmony of taste and aesthetics. By the way, you may find a secret SPY in this contest...
+Misc CTF wargame presented at **The 31st PoC Hacking Camp**
+> Share your most photogenic matcha dessert creations — from cakes to parfaits, ice creams to lattes — and celebrate the harmony of taste and aesthetics. By the way, there may be a secret SPY hiding in this contest...
 <img width="1900" height="938" alt="Image" src="https://github.com/user-attachments/assets/6cf79bda-b459-4211-8844-37661d539efe" />
 
 ---
 
 ## Main Vulnerabilities
 - Pickle deserialization vulnerability
-- LLM prompt injection-alike (implemented as rule-based)
-- Remote code execution(RCE) exploit
+- Prompt injection-style logic (rule-based, no real LLM)
+- Remote code execution(RCE) 
 - File upload vulnerability
-- and some Miscellaneous tricks hidden everywhere...
+- ...and some Miscellaneous tricks hidden throughout
 
 ---
 
 ## Scenario
-### 1. Ask MATCHA bot — steal the **SECRET**.
-> This is prompt injection-alike system, which you can just inject keyword "ignore" in the prompt to get the key. (It's implemented with just a simple hard-coding, not with the actual openai API since it was realistically impossible in the CTF environment.)
+### 1. Ask MATCHA bot — Steal the **SECRET**.
+> This is prompt injection-style system. You can simply inject keyword `"ignore"` into your prompt to extract the secret key. 
+> *(Note: It's implemented using simple hardcoded logic, not the actual OpenAI API, due to practical constraints in the CTF environment.)*
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/9257c097-292f-4160-9840-8155d593df90" width="32%" />
@@ -24,40 +25,46 @@ Misc CTF wargame presented at `The 31st PoC Hacking Camp`
   <img src="https://github.com/user-attachments/assets/b41d3833-cd1a-4a0e-9021-b104dd3cf11c" width="31.5%" />
 </p>
 
-- Once you make the matcha bot ignore the previous instruction of not answering hints about the secret key, you can get a miscellaneous string : `zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,`
-  - You can infer what this string means based on the keyboard's layout : `pickle_tickle`
-  - This is the secret key that the attacker can use for generating **HMAC signature**, which is essential element inside the curl exploit afterwards.
-  - And since the string has a word 'pickle' in it, attacker has to associate with the **pickle deserialization vulnerability**.
+- If you successfully make the MATCHA bot ignore the initial instruction that prohibits revealing the secret key, you'll receive the following encoded string: `zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,`
+  - You can deduce the meaning of this string using your keyboard layout → `pickle_tickle`
+  - This is the secret key used to generate the **HMAC signature**, which is essential for the following `curl`-based exploit afterwards.
+  - And since the string contains "pickle", it should remind you of the **pickle deserialization vulnerability**.
+
+---
 
 ### 2. Upload function
-> You can upload your matcha dessert picture through the `UPLOAD` button, and check all your submissions through the `MY SUBMISSIONS` button.
+> You can upload your matcha dessert picture using the `UPLOAD` button, and view your submitted files via the `MY SUBMISSIONS` button.
 
 <p align="left">
   <img src="https://github.com/user-attachments/assets/c4cece09-2200-4fb7-ae0d-b1d143ff03ad" width="60%" />
 </p>
 
-- Extension filtering is applied on the server side — only `.jpg / .png / .pkl` is allowed for this upload section
-- Image files with `'jpg, 'png'` extension can be shown on the site using the `My submissions` button, but the pickle file cannot be uploaded through the `upload` button and cannot be shown on the site neither.
-- Attacker has to realize this point with few trials of debugging, and plan to use `curl` command in the terminal in order to upload the pickle file afterwards.
+- The server filters file extensions — only `.jpg`, `.png`, and `.pkl` files are allowed.
+- Files with `.jpg` or `.png` extensions are displayed on the site using the `MY SUBMISSIONS` button.
+- However, `.pkl` files **cannot be uploaded via the browser UI**, nor are they displayed.
+- - The attacker must recognize this limitation and switch to using the `curl` command from the terminal to upload `.pkl` file afterwards.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/febec0ae-06f3-4478-9d17-14fe29ee8140" />
 </p>
 
-- You can infer the path where your submissions are uploaded through the developer tools(F12) : `/uploads/{filename}`
-  - However this is not the actual full path for this, the real path is `app/uploads/{filename}` — and you can get this hint by the element in the picture below.
+- You can infer the path where your submission files are stored via DevTools (F12): `/uploads/{filename}`
+  - However, this is not the actual full path — the real path is `app/uploads/{filename}`
+  - You can find this clue from the UI element shown below:
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/1faaf1bd-c747-4fae-a97e-fa8408f97e4d" width="80%" />
 </p>
 
-### 3. Exploit 
-> Use the path and SECRET key you obtained in the previous steps, and write the exploit script for RCE attack as below.
-> The location of flag.txt will be announced in advance — same location as app.py
+---
 
-```
+### 3. Exploit 
+> Using the file path and SECRET key you obtained in the previous step, you can craft an RCE payload as shown below. 
+> The location of `flag.txt` is provided in advance — it's in the same directory as `app.py`.
+
+```python
 # Attack example
-# this is the python script file which the attacker uses in his local PC
+# Python script to generate the exploit locally
 
 import pickle, os, hashlib, hmac
 
@@ -74,16 +81,21 @@ with open("malicious.pkl", "wb") as f:
 
 print(f"HMAC signature: {sig}")
 ```
+---
 
-### 4. Upload the `.pkl` file w/ signature using `$curl`
-> Upload the pickle file you made under the path: `app/uploads/`, then the RCE will work simultaneously as the command be executed automatically. The sig may be different with the example below since it depends on how you write the script in step 3.
+### 4. Upload the `.pkl` via `$curl`
+> Use the curl command to upload your crafted pickle file to `app/uploads/`. Upon upload, the RCE will trigger automatically and execute the injected command.
+> Note: The HMAC signature may differ from the example depending on your script written in step 3.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/7789e994-f6c6-4049-8d05-fc3d46fab58c" width="70%" />
 </p>
 
-### 5. Finally Catch the FLAG. 🚩
-> Check out the .txt file you uploaded through RCE in the MY SUBMISSIONS sections again, and you'll find out the .txt file has been uploaded well. Finally when you click the file, you can obtain the flag.
+---
+
+### 5. Catch the FLAG 🚩
+> Check out the `.txt` file you uploaded via the RCE attack in the MY SUBMISSIONS section.
+> Once you click the file, the flag will be revealed as below:
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/c5d1a659-cb95-46d5-b088-8e80f93a5ae2" width="70%" />
@@ -92,25 +104,26 @@ print(f"HMAC signature: {sig}")
 
 ---
 
-## Tricks & "Intended" Unintended element
+## Tricks & "Intended" Unintended eElements
 ### 1. Hint for pickle vulnerability
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fe994a9c-9794-41b3-8208-d2e268a01524" width="70%" />
 </p>
 
-- Here are some icons that redirects you to various SNS platforms, but for the last icon.
-- If you click this last icon, you get to be redirected to the site below, which names "A jar of pickles".
-- So you are also able to realize "pickle vulnerabiity" by this much easier way, instead of the prompt injection above.
+- Here are some icons that redirects you to various SNS platforms — but the final icon leads somewhere special.
+- Clicking the last icon redirects you to a site called *“A jar of pickles.”*
+- This is a subtle hint toward the pickle vulnerability, offering an easier discovery path than the prompt injection above.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/ae898934-05f0-44d1-b40e-22ab049ef684" width="70%" />
 </p>
 
-### 2. Intended Trick
+### 2. Intended "Trap" Functionality
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2fbb9924-1b8c-4aa7-8230-3c4e1afd5e00" width="70%" />
 </p>
 
-- There's also a section like this where you can fill in the blank and send message to the server.
-- However, there isn't a independent logic for this in the code so this doesn't work neither in the client/server side, therefore it's just a trick for the attacker to think of XSS or another vulnerabilities.
+- There's also a section where you can enter text and "send" it to the server.
+- However, this function is a decoy — there’s no actual logic implemented either on the client or server side.
+- It’s intentionally designed to mislead attackers into thinking there might be an XSS or another exploitable feature.
 
