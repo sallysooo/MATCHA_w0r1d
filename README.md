@@ -104,7 +104,7 @@ print(f"HMAC signature: {sig}")
 
 ---
 
-## Tricks & "Intended" Unintended eElements
+## Tricks & "Intended" Unintended Elements
 ### 1. Hint for pickle vulnerability
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fe994a9c-9794-41b3-8208-d2e268a01524" width="70%" />
