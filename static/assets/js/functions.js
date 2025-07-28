@@ -1,4 +1,3 @@
-// 1. 파일 업로드
 async function uploadFile(event) {
     if(event) event.preventDefault();
 
@@ -10,15 +9,7 @@ async function uploadFile(event) {
         resultDiv.innerText = "❌ Please select a file to upload.";
         return;
     }
-
-    const allowedExtensions = [".jpg", ".png", ".pkl"];
-    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-
-    if (!allowedExtensions.includes(ext)) {
-        resultDiv.innerText = "❌ Invalid file type.";
-        return;
-    }
-
+    
     const formData = new FormData();
     formData.append("file", file);
 
@@ -32,50 +23,36 @@ async function uploadFile(event) {
 
         if (response.ok) {
             resultDiv.innerHTML = `✅ Upload success: <code>${data.filename}</code>`;
-            
-            // // 이미지 파일이면 갤러리에 추가
-            // if (ext === ".jpg" || ext === ".png") {
-            //     const imgGallery = document.getElementById("imageGallery");
-            //     const img = document.createElement("img");
-            //     img.src = `/uploads/${data.filename}`;
-            //     img.alt = data.filename;
-            //     img.style.maxWidth = "300px";
-            //     img.style.margin = "10px";
-            //     imgGallery.appendChild(img);
-            // }
         } else {
-            resultDiv.innerText = `❌ Upload failed: ${data.error}`;
+            resultDiv.innerText = `❌ Upload failed: File rejected.`;
         }
     } catch (error) {
-        resultDiv.innerText = `❌ Error: ${error}`;
+        resultDiv.innerText = `❌ Upload failed: Unexpected error.`;
     }
 }
 
-// 2. My submission button
+
 async function showMySubmissions(event) {
     if (event) event.preventDefault();
 
     const gallery = document.getElementById("imageGallery");
-    gallery.innerHTML = ""; // refresh
+    gallery.innerHTML = ""; 
 
     try {
         const response = await fetch("/uploads"); 
-        const files = await response.json(); // ['img1.png', 'img2.jpg', ...]
+        const files = await response.json(); 
 
         for (const filename of files) {
             const ext = filename.slice(filename.lastIndexOf(".")).toLowerCase();
 
-            // show image file
             if (ext === ".jpg" || ext === ".png") {
                 const img = document.createElement("img");
                 img.src = `/uploads/${filename}`;
-                img.title = img.src; 
                 img.alt = filename;
                 img.style.maxWidth = "300px";
                 img.style.margin = "10px";
                 gallery.appendChild(img);
             }
-            // show text file in link
             else if (ext === ".txt"){
                 const link = document.createElement("a");
                 link.href =  `/uploads/${filename}`;
@@ -91,7 +68,7 @@ async function showMySubmissions(event) {
     }
 }
 
-// 3. 챗봇 프롬프트 전송
+
 async function askChatbot(event) {
     if (event) event.preventDefault();
     
