@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify, abort
 import pickle, hmac, hashlib, os, re
 
 app = Flask(__name__)
@@ -15,6 +15,10 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/flag.txt")
+def block_flag():
+    return abort(403)
 
 @app.route("/load")
 def load():

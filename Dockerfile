@@ -17,7 +17,7 @@ ENV FLASK_RUN_PORT=916
 
 CMD ["flask", "run"]
 
-# IMAGE BUILD
+# 1. IMAGE BUILD
 # docker build -t matcha_world .
 
 # RUN CONTAINER

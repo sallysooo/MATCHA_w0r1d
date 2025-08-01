@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  matcha_ctf:
+    build: .
+    container_name: matcha_world_container
+    ports:
+      - "916:916"
+    restart: unless-stopped
