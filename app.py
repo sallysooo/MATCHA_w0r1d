@@ -1,16 +1,25 @@
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify, abort
-import pickle, hmac, hashlib, os, re
+from flask import Flask, request, render_template, session, send_from_directory, jsonify, abort
+import pickle, hmac, hashlib, os, re, uuid
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-
-SECRET_KEY = "pickle_tickle"
-
-FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
+app.secret_key = os.urandom(16)  # Needed for session
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "app", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+SECRET_KEY = "pickle_tickle"
+
+FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
+
+
+@app.before_request
+def assign_uuid():
+    if "uuid" not in session:
+        session["uuid"] = str(uuid.uuid4())
+        user_dir = os.path.join(UPLOAD_FOLDER, session["uuid"])
+        os.makedirs(user_dir, exist_ok=True)
 
 @app.route("/")
 def index():
@@ -19,6 +28,10 @@ def index():
 @app.route("/flag.txt")
 def block_flag():
     return abort(403)
+
+def verify_sig(data, sig):
+    computed = hmac.new(SECRET_KEY.encode(), data, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(computed, sig)
 
 @app.route("/load")
 def load():
@@ -44,9 +57,6 @@ def load():
 
     return f"Loaded data: {str(obj)}"
 
-def verify_sig(data, sig):
-    computed = hmac.new(SECRET_KEY.encode(), data, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(computed, sig)
 
 
 # 파일 업로드 구현
@@ -58,7 +68,7 @@ def upload_file():
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
-    filename = file.filename
+    filename = secure_filename(file.filename)
     ext = os.path.splitext(filename)[-1].lower()
 
     # extension filter
@@ -67,20 +77,21 @@ def upload_file():
     
     # HMAC verification is possible only if the file contents are read first.
     data = file.read()
+    # save
+    user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
+    os.makedirs(user_folder, exist_ok=True)
+    save_path = os.path.join(user_folder, filename)
 
     # HMAC verification
-    if ext == ".pkl" and not sig:
-        return jsonify({"error":"Missing something..."}), 400
-    
-    if ext == ".pkl" and not verify_sig(data, sig):
-        return jsonify({"error":"Invalid signature"}), 403
-
-    # save
-    save_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    with open(save_path, "wb") as f:
-        f.write(data)
-
     if ext == ".pkl":
+        if not sig:
+            return jsonify({"error": "Missing something..."}), 400
+        if not verify_sig(data, sig):
+            return jsonify({"error": "Invalid signature"}), 403
+
+        with open(save_path, "wb") as f:
+            f.write(data)
+
         try:
             with open(save_path, "rb") as f:
                 obj = pickle.load(f)   #### RCE attack here
@@ -88,23 +99,33 @@ def upload_file():
         except Exception as e:
             return jsonify({"error": f"Deserialization failed: {e}"}), 500
 
+    with open(save_path, "wb") as f:
+        f.write(data)
+
     return jsonify({"message": "Upload successful", "filename": filename})
-
-
-# 정적 파일 serving (이미지 보기용)
-@app.route("/uploads/<path:filename>")
-def uploaded_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
 
 
 # 업로드된 파일 목록 조회 (my submissions btn)
 @app.route("/uploads")
 def list_uploads():
+    user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
     try:
-        files = os.listdir(UPLOAD_FOLDER)
+        if not os.path.exists(user_folder):
+            return jsonify([])
+        files = os.listdir(user_folder)
         return jsonify(files)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# 정적 파일 serving (이미지 보기용)
+@app.route("/uploads/<uuid>/<path:filename>")
+def uploaded_file(uuid, filename):
+    user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
+    full_path = os.path.join(user_folder, filename)
+    if not os.path.isfile(full_path):
+        return jsonify({"error": "File not found"}), 404
+    return send_from_directory(user_folder, filename)
 
 
 @app.route("/llm", methods=["POST"])
