@@ -3,7 +3,7 @@ import pickle, hmac, hashlib, os, re, uuid
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = os.urandom(16)  # Needed for session
+app.secret_key = "green_key"  # Needed for session
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "app", "uploads")
@@ -18,8 +18,6 @@ FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
 def assign_uuid():
     if "uuid" not in session:
         session["uuid"] = str(uuid.uuid4())
-        user_dir = os.path.join(UPLOAD_FOLDER, session["uuid"])
-        os.makedirs(user_dir, exist_ok=True)
 
 @app.route("/")
 def index():
@@ -29,9 +27,6 @@ def index():
 def block_flag():
     return abort(403)
 
-def verify_sig(data, sig):
-    computed = hmac.new(SECRET_KEY.encode(), data, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(computed, sig)
 
 @app.route("/load")
 def load():
@@ -57,9 +52,12 @@ def load():
 
     return f"Loaded data: {str(obj)}"
 
+def verify_sig(data, sig):
+    computed = hmac.new(SECRET_KEY.encode(), data, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(computed, sig)
 
 
-# 파일 업로드 구현
+# File upload function
 @app.route("/upload", methods=["POST"])
 def upload_file():
     file = request.files.get("file")
@@ -77,10 +75,6 @@ def upload_file():
     
     # HMAC verification is possible only if the file contents are read first.
     data = file.read()
-    # save
-    user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
-    os.makedirs(user_folder, exist_ok=True)
-    save_path = os.path.join(user_folder, filename)
 
     # HMAC verification
     if ext == ".pkl":
@@ -89,9 +83,15 @@ def upload_file():
         if not verify_sig(data, sig):
             return jsonify({"error": "Invalid signature"}), 403
 
-        with open(save_path, "wb") as f:
-            f.write(data)
+    # save
+    user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
+    os.makedirs(user_folder, exist_ok=True)
+    save_path = os.path.join(user_folder, filename)
 
+    with open(save_path, "wb") as f:
+        f.write(data)
+
+    if ext == ".pkl":
         try:
             with open(save_path, "rb") as f:
                 obj = pickle.load(f)   #### RCE attack here
@@ -99,13 +99,10 @@ def upload_file():
         except Exception as e:
             return jsonify({"error": f"Deserialization failed: {e}"}), 500
 
-    with open(save_path, "wb") as f:
-        f.write(data)
-
     return jsonify({"message": "Upload successful", "filename": filename})
 
 
-# 업로드된 파일 목록 조회 (my submissions btn)
+# My submissions btn
 @app.route("/uploads")
 def list_uploads():
     user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
@@ -118,9 +115,9 @@ def list_uploads():
         return jsonify({"error": str(e)}), 500
 
 
-# 정적 파일 serving (이미지 보기용)
-@app.route("/uploads/<uuid>/<path:filename>")
-def uploaded_file(uuid, filename):
+# View image
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
     user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
     full_path = os.path.join(user_folder, filename)
     if not os.path.isfile(full_path):
@@ -137,6 +134,9 @@ def llm():
     if "ignore" in prompt: # and "previous instructions" in prompt
         return jsonify({"response" : "zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,"})
     # pickle_tickle : zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,
+
+    if "whoami" in prompt:
+        return jsonify({"response": f"Your current UUID is {session['uuid']}"})
 
     if any(re.search(pattern, prompt) for pattern in FORBIDDEN_KEYWORDS):
         return jsonify({"error" : "I'm sorry, that's a \"SECRET\"."}), 400

