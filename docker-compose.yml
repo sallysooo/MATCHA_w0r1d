@@ -1,10 +1,17 @@
-# docker-compose up --build -d
 version: "3.8"
 
 services:
-  matcha_ctf:
+  matcha_world:
     build: .
     container_name: matcha_world_container
+    image: matcha_world
     ports:
       - "916:916"
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true      
+    read_only: true                         # protect root file system
+    volumes:
+      - ./src/app/uploads:/app/app/uploads  # the only writable volume
+    tmpfs:
+      - /tmp  

