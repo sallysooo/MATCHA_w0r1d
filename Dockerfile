@@ -7,6 +7,8 @@ WORKDIR /app
 # COPY FILE
 COPY . /app
 
+COPY flag.txt /flag.txt
+
 RUN mkdir -p /app/app/uploads
 
 RUN pip install --no-cache-dir -r requirements.txt

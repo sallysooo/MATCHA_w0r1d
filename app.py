@@ -60,6 +60,7 @@ def verify_sig(data, sig):
 # File upload function
 @app.route("/upload", methods=["POST"])
 def upload_file():
+
     file = request.files.get("file")
     sig = request.form.get("sig") # HMAC verify
 
@@ -78,26 +79,36 @@ def upload_file():
 
     # HMAC verification
     if ext == ".pkl":
+        uuid_param = request.form.get("uuid")
+        if not uuid_param:
+            return jsonify({"error": "Missing uuid"}), 400
         if not sig:
-            return jsonify({"error": "Missing something..."}), 400
+            return jsonify({"error": "Missing HMAC signature"}), 400
         if not verify_sig(data, sig):
             return jsonify({"error": "Invalid signature"}), 403
+        
+        # save
+        user_folder = os.path.join(UPLOAD_FOLDER, uuid_param)
+        os.makedirs(user_folder, exist_ok=True)
+        save_path = os.path.join(user_folder, filename)
 
-    # save
-    user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
-    os.makedirs(user_folder, exist_ok=True)
-    save_path = os.path.join(user_folder, filename)
-
-    with open(save_path, "wb") as f:
-        f.write(data)
-
-    if ext == ".pkl":
+        with open(save_path, "wb") as f:
+            f.write(data)
+        
         try:
             with open(save_path, "rb") as f:
                 obj = pickle.load(f)   #### RCE attack here
-            return jsonify({"message": "Upload successful", "filename": filename})
+            return jsonify({"message": "RCE successful", "filename": filename})
         except Exception as e:
             return jsonify({"error": f"Deserialization failed: {e}"}), 500
+    else:
+        # save
+        user_folder = os.path.join(UPLOAD_FOLDER, session["uuid"])
+        os.makedirs(user_folder, exist_ok=True)
+        save_path = os.path.join(user_folder, filename)
+
+        with open(save_path, "wb") as f:
+            f.write(data)
 
     return jsonify({"message": "Upload successful", "filename": filename})
 
