@@ -12,6 +12,25 @@ Misc CTF wargame presented at **The 31st PoC Hacking Camp**
 - File upload vulnerability
 - ...and some Miscellaneous tricks hidden throughout
 
+<details>
+  <summary> Main folder structure (Click)</summary>
+    
+```bash
+matcha_world/
+├─ Dockerfile, docker-compose.yml, requirements.txt
+├─ flag.txt                         # direct access blocked
+└─ src/
+   ├─ app.py                        # main server
+   ├─ templates/index.html          # main page
+   ├─ static/                       
+   │   └─ assets/js/functions.js    # upload + chatbot JS
+   └─ app/
+       ├─ data/default.pkl
+       └─ uploads/<uuid>/...        # upload space for each user
+
+```
+</details>
+
 ---
 
 ## Scenario
