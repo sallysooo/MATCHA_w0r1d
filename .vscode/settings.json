@@ -1,5 +1,16 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:conda",
     "python-envs.defaultPackageManager": "ms-python.python:conda",
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+
+    // 새 터미널 열 때 conda 환경 자동 활성화
+    "python.terminal.activateEnvironment": true,
+
+    // 터미널 기본 프로필을 PowerShell로 지정
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
 }

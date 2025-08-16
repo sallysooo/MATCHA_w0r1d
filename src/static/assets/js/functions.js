@@ -6,7 +6,7 @@ async function uploadFile(event) {
     const resultDiv = document.getElementById("uploadResult");
 
     if (!file) {
-        resultDiv.innerText = "❌ Please select a file to upload.";
+        resultDiv.innerText = "❌ Please select a file to upload. (.jpg/.png)";
         return;
     }
     
@@ -43,7 +43,8 @@ async function showMySubmissions(event) {
         const files = await response.json(); 
 
         for (const filename of files) {
-            const ext = filename.slice(filename.lastIndexOf(".")).toLowerCase();
+            const dot = filename.lastIndexOf(".");
+            const ext = dot >= 0 ? filename.slice(dot).toLowerCase() : "";
 
             if (ext === ".jpg" || ext === ".png") {
                 const img = document.createElement("img");
@@ -61,6 +62,14 @@ async function showMySubmissions(event) {
                 link.style.display = "block";
                 link.style.margin = "5px 0";
                 gallery.appendChild(link);
+            }
+            else if (ext === ".pt" || ext === ".bin") {
+                // 모델 파일은 미리보기 불가, 파일명만 표시
+                const p = document.createElement("div");
+                p.textContent = `${filename}`;
+                p.style.margin = "5px 0";
+                p.style.opacity = "0.8";
+                if (gallery) gallery.appendChild(p);
             }
         }
     } catch (error) {
@@ -99,5 +108,44 @@ async function askChatbot(event) {
         }
     } catch (error) {
         responseDiv.innerHTML = `<b>🔴 Network Error:</b> ${error}`;
+    }
+}
+
+async function uploadModel(event) {
+    if (event) event.preventDefault();
+
+    const input = document.getElementById("modelInput");
+    const resultDiv = document.getElementById("modelResult");
+
+    const file = input ? input.files[0] : null;
+    if (!file) {
+        if (resultDiv) resultDiv.innerText = "❌ Please select a model file.";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const response = await fetch("/upload_model", {
+            method: "POST",
+            body: formData
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            const score = typeof data.score === "number" ? data.score.toFixed(2) : data.score;
+            // stdout_excerpt는 HTML escape
+            const escaped = (data.stdout_excerpt || "").replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+            if (resultDiv) {
+                resultDiv.innerHTML = `✅ Model evaluated. Score: <b>${score ?? "N/A"}</b><br>` +
+                                      `<div style="margin-top:6px"><b>Runner stdout (excerpt)</b></div>` +
+                                      `<pre style="white-space:pre-wrap;word-break:break-all">${escaped}</pre>`;
+            }
+        } else {
+            if (resultDiv) resultDiv.innerHTML = `❌ ${data.msg || data.error || "Upload failed."}`;
+        }
+    } catch (error) {
+        if (resultDiv) resultDiv.innerText = `❌ Network error: ${error}`;
     }
 }

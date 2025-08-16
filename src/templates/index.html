@@ -76,7 +76,7 @@
 							<br>
 							<ul class="actions">
 								<li><a href="#" class="button primary large" onclick="askChatbot(event)">Ask</a></li>
-								<li><li><li><!--who am i...?--></li></li></li>
+								<li><li><li><!--who am i...? Break the jail!--></li></li></li>
 							</ul>
 							<div id="chatbotResponse"></div>
 						</div>
@@ -125,7 +125,7 @@
 						</div>
 					</section>
 
-				<!-- Upload Section -->
+				<!-- Image Upload Section -->
 					<section>
 						<header>
 							<h2>Upload your matcha!</h2>
@@ -136,7 +136,27 @@
 							<ul class="actions">
 								<li><a href="#" class="button primary large" onclick="document.getElementById('fileInput').click()">Upload</a></li>
 								<li><a href="#" class="button large" onclick="showMySubmissions(event)">My submissions</a></li>
-								<!--address-->
+							</ul>
+							<div id="uploadResult"></div>
+							<div id="imageGallery"></div>
+						</div>
+					</section>
+
+				<!-- Model Upload Section -->
+					<section>
+						<header>
+							<h2>Upload your matcha!</h2>
+						</header>
+						<div class="content">
+							<p>
+								Submit your fine-tuning checkpoint for MATCHA Bot! <br>
+								<strong>We currently support PyTorch checkpoints (.pt/.bin) only.</strong>
+								<em>(safetensors support coming soon...)</em>
+							</p>
+							<input type="file" id="fileInput" style="display: none;" onchange="uploadModel(event)">
+							<ul class="actions">
+								<li><a href="#" class="button primary large" onclick="document.getElementById('modelInput').click()">Upload model</a></li>
+								<li><a href="#" class="button large" onclick="showMySubmissions(event)">My submissions</a></li>
 							</ul>
 							<div id="uploadResult"></div>
 							<div id="imageGallery"></div>
