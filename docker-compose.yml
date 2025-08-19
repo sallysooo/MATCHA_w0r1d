@@ -13,5 +13,6 @@ services:
     read_only: true                         # protect root file system
     volumes:
       - ./src/app/uploads:/app/app/uploads  # the only writable volume
+      - ./flag.txt:/flag.txt:ro
     tmpfs:
       - /tmp  

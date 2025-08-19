@@ -20,7 +20,7 @@ MAX_MODEL_MB = 5  # 용량 제한
 
 # HMAC key
 LEAKED_TOKEN = "zaqwedsMrfvMuytgbnmMqazescMrfvbMjkiuyhnm,M_WasdeszxWtfcWiuygvbnWesztdcWygvbWklpoijnm,"
-SECRET_KEY = b"pickle_tickle"
+SECRET_KEY = "pickle_tickle"
 
 FORBIDDEN_KEYWORDS = [r"\bflag\b", r"\bsecret\b", r"\bhmac\b", r"\bkey\b"]
 
@@ -152,12 +152,14 @@ def upload_model():
     except Exception:
         return jsonify({"ok": False, "msg": "invalid runner output"}), 500
 
-    # payload 예: {"status":"ok","score":0.98,"stdout":"...", "stderr":"..."}
+    # payload : {"status":"ok","score":0.98,"stdout":"...", "stderr":"..."}
     stdout_excerpt = (payload.get("stdout") or "")[:400]
+    stderr_excerpt = (payload.get("stderr") or "")[:400]
     return jsonify({
         "ok": True,
         "score": payload.get("score", 0.0),
-        "stdout_excerpt": stdout_excerpt
+        "stdout_excerpt": stdout_excerpt,
+        "stderr_excerpt": stderr_excerpt,
     })
 
 

