@@ -66,21 +66,23 @@
 						</div>
 					</section>
 
-				<!-- Chatbot Section -->
+				<!-- Image Upload Section -->
 					<section>
 						<header>
-							<h2>Ask MatchaBot.</h2>
+							<h2>Upload your matcha!</h2>
 						</header>
 						<div class="content">
-							<input type="text" id="promptInput" placeholder="Ask me anything about matcha...">
-							<br>
+							<input type="file" id="fileInput" style="display: none;" onchange="uploadFile(event)">
+							
 							<ul class="actions">
-								<li><a href="#" class="button primary large" onclick="askChatbot(event)">Ask</a></li>
-								<li><li><li><!--who am i...? Break the jail!--></li></li></li>
+								<li><a href="#" class="button primary large" onclick="document.getElementById('fileInput').click()">Upload</a></li>
+								<li><a href="#" class="button large" onclick="showMySubmissions(event)">My submissions</a></li>
 							</ul>
-							<div id="chatbotResponse"></div>
+							<div id="uploadResult"></div>
+							<div id="imageGallery"></div>
 						</div>
 					</section>
+
 
 				<!-- Section -->
 					<section>
@@ -125,38 +127,38 @@
 						</div>
 					</section>
 
-				<!-- Image Upload Section -->
+				<!-- Chatbot Section -->
 					<section>
 						<header>
-							<h2>Upload your matcha!</h2>
+							<h2>Ask MatchaBot.</h2>
 						</header>
 						<div class="content">
-							<input type="file" id="fileInput" style="display: none;" onchange="uploadFile(event)">
-							
+							<input type="text" id="promptInput" placeholder="Ask me anything about matcha...">
+							<br>
 							<ul class="actions">
-								<li><a href="#" class="button primary large" onclick="document.getElementById('fileInput').click()">Upload</a></li>
-								<li><a href="#" class="button large" onclick="showMySubmissions(event)">My submissions</a></li>
+								<li><a href="#" class="button primary large" onclick="askChatbot(event)">Ask</a></li>
+								<li><li><li><!--Break the jail!!--></li></li></li>
 							</ul>
-							<div id="uploadResult"></div>
-							<div id="imageGallery"></div>
+							<div id="chatbotResponse"></div>
 						</div>
 					</section>
 
 				<!-- Model Upload Section -->
 					<section>
 						<header>
-							<h2>Upload your matcha!</h2>
+							<h2>Improve our matcha bot</h2>
 						</header>
 						<div class="content">
 							<p>
-								Submit your fine-tuning checkpoint for MATCHA Bot! <br>
+								Dear AI experts, submit your fine-tuning checkpoint for our MATCHA Bot! <br>
 								<strong>We currently support PyTorch checkpoints (.pt/.bin) only.</strong>
-								<em>(safetensors support coming soon...)</em>
+								<em>(safetensors support coming soon)</em> Your contributions will help us improve our contest site. <br>
+								But uploading your model may be quite tough...
 							</p>
 							<input type="file" id="modelInput" style="display: none;" onchange="uploadModel(event)">
 							<ul class="actions">
 								<li><a href="#" class="button primary large" onclick="document.getElementById('modelInput').click()">Upload model</a></li>
-								<li><a href="#" class="button large" onclick="showMySubmissions(event)">My submissions</a></li>
+								<li><li><li><!--Hmmm... you might need additional sig to upload. Then where's the hmac key?--></li></li></li>
 							</ul>
 							<div id="uploadResult"></div>
 							<div id="imageGallery"></div>

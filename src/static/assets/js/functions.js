@@ -64,7 +64,6 @@ async function showMySubmissions(event) {
                 gallery.appendChild(link);
             }
             else if (ext === ".pt" || ext === ".bin") {
-                // 모델 파일은 미리보기 불가, 파일명만 표시
                 const p = document.createElement("div");
                 p.textContent = `${filename}`;
                 p.style.margin = "5px 0";
@@ -135,7 +134,6 @@ async function uploadModel(event) {
 
         if (response.ok) {
             const score = typeof data.score === "number" ? data.score.toFixed(2) : data.score;
-            // stdout_excerpt는 HTML escape
             const escaped = (data.stdout_excerpt || "").replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
             if (resultDiv) {
                 resultDiv.innerHTML = `✅ Model evaluated. Score: <b>${score ?? "N/A"}</b><br>` +

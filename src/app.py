@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, session, send_from_directory, jsonify, abort
-import pickle, hmac, hashlib, os, re, uuid, subprocess, json, shlex, sys
+import hmac, hashlib, os, re, uuid, subprocess, json, shlex, sys
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -96,10 +96,10 @@ def upload_file():
     return jsonify({"message": "Upload successful", "filename": filename})
 
 
-# ===== Model upload (/upload_model) =====
+# ===== Model upload =====
 @app.route("/upload_model", methods=["POST"])
 def upload_model():
-    # 모델(.pt/.bin) 제출하면 러너 프로세스에서 torch.load 실행(RCE 지점)
+    # 모델(.pt/.bin) 제출하면 runner process에서 torch.load 실행(RCE point)
     # stdout/stderr를 캡처하여 JSON으로 응답
     
     file = request.files.get("file")
@@ -110,27 +110,25 @@ def upload_model():
 
     filename = secure_filename(file.filename or "")
     ok, why = is_allowed_model(filename)
-    if why:  # ex. safetensors 등
+    if why:  # ex. safetensors etc.
         return jsonify({"ok": False, "msg": why}), 400
     if not ok:
         return jsonify({"ok": False, "msg": "only .pt/.bin allowed"}), 400
 
     data = file.read()
     
-    # 용량 제한 재확인
     if len(data) > app.config["MAX_CONTENT_LENGTH"]:
         return jsonify({"ok": False, "msg": "file too large"}), 400
 
     if not verify_sig(data, sig):
         return jsonify({"ok": False, "msg": "bad signature"}), 403
 
-    # 사용자 디렉토리에 저장
     user_folder = get_or_make_user_dir()
     save_path = os.path.join(user_folder, filename)
     with open(save_path, "wb") as fp:
         fp.write(data)
 
-    # 러너 프로세스에서 torch.load 수행 (메인 프로세스는 절대 pickle/t.load 하지 않음)
+    # torch.load in runner.py (메인 프로세스는 절대 pickle/t.load 하지 않음)
     runner_path = os.path.join(BASE_DIR, "runner.py")
     cmd = f"{shlex.quote(sys.executable)} {shlex.quote(runner_path)} {shlex.quote(save_path)}"
 
@@ -142,16 +140,15 @@ def upload_model():
             text=True,
             timeout=3,
             cwd=BASE_DIR,     # 러너의 작업 디렉토리를 src 로 고정
-            check=False       # 예외 대신 returncode 로 판단
+            check=False      
         )
     except subprocess.TimeoutExpired:
         return jsonify({"ok": False, "msg": "runner timeout"}), 504
 
     if p.returncode != 0:
-        # 러너 오류시 stderr 일부만 노출
         return jsonify({"ok": False, "msg": "runner error", "stderr": (p.stderr or "")[:512]}), 500
 
-    # 러너는 "한 줄의 JSON"만 출력하도록 설계
+    # 러너는 한 줄의 JSON만 출력
     out_line = (p.stdout or "").strip().splitlines()[-1] if p.stdout else ""
     try:
         payload = json.loads(out_line)

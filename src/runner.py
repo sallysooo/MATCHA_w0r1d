@@ -1,6 +1,7 @@
 import sys, os, json, tempfile, pickle
 import torch   # CPU 전용 설치
-# FD(파일 디스크립터) 레벨 stdout/stderr 캡처 도우미
+import random
+# FD(file descriptor) level stdout/stderr capture
 
 class CaptureFD:
     def __enter__(self):
@@ -22,7 +23,7 @@ class CaptureFD:
         self._tmp_out.close(); self._tmp_err.close()
 
 def load_with_fallback(path):
-    # 1) torch.load (RCE 지점) : weights_only=False 를 반드시 명시
+    # 1) torch.load (RCE point) : weights_only=False 를 반드시 명시
     try:
         with CaptureFD() as cap:
             _ = torch.load(path, map_location="cpu", weights_only=False, pickle_module=pickle)
@@ -32,7 +33,7 @@ def load_with_fallback(path):
         try:
             with CaptureFD() as cap:
                 with open(path, "rb") as f:
-                    _ = pickle.load(f)   # RCE 지점(픽클)
+                    _ = pickle.load(f)   # RCE point(pickle)
             return True, cap.stdout, cap.stderr, None
         except Exception as e2:
             return False, "", "", f"torch.load failed: {type(e1).__name__}: {e1} | pickle.load failed: {type(e2).__name__}: {e2}"
@@ -47,10 +48,13 @@ def main():
         print(json.dumps({"status":"err","msg":err}))
         sys.exit(1)
 
-    # 그럴듯한 더미 스코어
+    # plausible dummy score settings
+    decimals = random.randint(2, 4)
+    score = round(random.uniform(0.68, 0.99), decimals)
+
     print(json.dumps({
         "status":"ok",
-        "score":0.98,
+        "score":score,
         "stdout": out_s,
         "stderr": err_s
     }))
