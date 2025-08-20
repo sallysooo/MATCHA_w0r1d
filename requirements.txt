@@ -1,2 +1,4 @@
-flask==2.2.5
-werkzeug==2.2.3
+Flask==3.0.2
+itsdangerous==2.2.0
+Werkzeug==3.0.1
+# torch==2.3.0+cpu ; extra-index-url https://download.pytorch.org/whl/cpu

@@ -11,8 +11,12 @@ services:
     security_opt:
       - no-new-privileges:true      
     read_only: true                         # protect root file system
+    cap_drop:
+      - ALL
     volumes:
-      - ./src/app/uploads:/app/app/uploads  # the only writable volume
-      - ./flag.txt:/flag.txt:ro
+      # Persist uploads (only writable area in container)
+      - ./src/app/uploads:/app/app/uploads 
+      # IMPORTANT: bind the real flag into container root as read-only
+      - ./src/flag.txt:/flag.txt:ro
     tmpfs:
-      - /tmp  
+      - /tmp:rw,noexec,nosuid,size=64m

@@ -1,4 +1,4 @@
-# Attack scenario (test)
+# Local Attack scenario 1 (test)
 # this is the script file which the attacker generates evil .pt file in local PC
 
 import pickle, os, io
