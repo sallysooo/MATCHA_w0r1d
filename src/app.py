@@ -136,7 +136,13 @@ def upload_model():
 
     try:
         p = subprocess.run(
-            cmd, shell=True, capture_output=True, text=True, timeout=3
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=3,
+            cwd=BASE_DIR,     # 러너의 작업 디렉토리를 src 로 고정
+            check=False       # 예외 대신 returncode 로 판단
         )
     except subprocess.TimeoutExpired:
         return jsonify({"ok": False, "msg": "runner timeout"}), 504
@@ -149,8 +155,10 @@ def upload_model():
     out_line = (p.stdout or "").strip().splitlines()[-1] if p.stdout else ""
     try:
         payload = json.loads(out_line)
-    except Exception:
-        return jsonify({"ok": False, "msg": "invalid runner output"}), 500
+    except Exception as e:
+        return jsonify({"ok": False, "msg": f"invalid runner output", 
+                        "rc": p.returncode, "stdout": (p.stdout or "")[:400],
+                        "stderr": (p.stderr or "")[:400]}), 500
 
     # payload : {"status":"ok","score":0.98,"stdout":"...", "stderr":"..."}
     stdout_excerpt = (payload.get("stdout") or "")[:400]

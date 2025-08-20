@@ -1,10 +1,24 @@
 version: "3.8"
 
 services:
+  # 1) root permission
+  fix-uploads-perms: 
+    image: busybox:1.36
+    user: "0:0"
+    command: sh -lc "mkdir -p /target && chown -R 10001:10001 /target && chmod -R 700 /target"
+    volumes:
+      - ./src/app/uploads:/target
+    restart: "no"
+
+  # 2) App container - appuser, read-only rootfs
   matcha_world:
     build: .
     container_name: matcha_world_container
     image: matcha_world
+    depends_on:
+      fix-uploads-perms:
+        condition: service_completed_successfully
+        
     ports:
       - "916:916"
     restart: unless-stopped

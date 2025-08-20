@@ -3,7 +3,7 @@
 
 import hmac, hashlib
 KEY = "pickle_tickle".encode()  
-data = open("payloads/evil2.pt","rb").read()
+data = open("evil2.pt","rb").read()
 print(hmac.new(KEY, data, hashlib.sha256).hexdigest())
 
 '''

