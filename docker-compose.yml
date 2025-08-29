@@ -22,8 +22,8 @@ services:
     ports:
       - "916:916"
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true      
+    # security_opt:
+    #  - no-new-privileges:true      
     read_only: true                         # protect root file system
     cap_drop:
       - ALL

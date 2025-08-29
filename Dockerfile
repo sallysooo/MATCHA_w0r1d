@@ -43,5 +43,5 @@ ENV FLASK_RUN_PORT=916
 EXPOSE 916
 
 # RUN SERVER
-CMD ["flask", "run"]
+CMD ["python", "-m", "gunicorn.app.wsgiapp", "-w", "2", "-b", "0.0.0.0:916", "app:app"]
 
