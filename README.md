@@ -34,8 +34,7 @@ matcha_world/
 ## How to Run
 Requirements: Docker + docker compose
 ```bash
-$ sudo docker compose build --no-cache
-$ docker compose up -d
+$ sudo docker compose up -d --build
 # app listens on http://localhost:916
 ```
 
