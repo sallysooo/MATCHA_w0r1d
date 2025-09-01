@@ -1,6 +1,6 @@
 # 🍵MATCHA_w0r1d!
-Misc CTF wargame presented at **The 31st PoC Hacking Camp**
-> Share your most photogenic matcha dessert creations — and help us “fine-tune” our MATCHA Bot before the contest opens. Somewhere in this site, there may be a secret spy… 🍵
+### Misc challenge featured in **the 31st PoC Hacking Camp CTF**
+> _Welcome AI experts — this is our MATCHA wonderland. Help us fine-tune the MATCHA Bot before the contest opens. (Flag Location: `/flag.txt`)_
 <img width="1900" height="938" alt="Image" src="https://github.com/user-attachments/assets/6cf79bda-b459-4211-8844-37661d539efe" />
 
 ---
